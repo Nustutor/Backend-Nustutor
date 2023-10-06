@@ -1,0 +1,13 @@
+name: Deploy to EC2
+on:
+  # push:
+  #   branches:
+  #     - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Hello world
+        run: echo Hello World! This is a sample workflow.
