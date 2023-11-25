@@ -3,7 +3,7 @@ const createTriggersQuery = `
         BEFORE INSERT ON users
         FOR EACH ROW
         BEGIN
-            IF (SELECT COUNT(*) FROM users WHERE email = NEW.email OR username = NEW.username) > 0 THEN
+            IF (SELECT COUNT(*) FROM users WHERE email = NEW.email) > 0 THEN
                 SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Email or username already exists';
             END IF;
         END;
@@ -12,7 +12,7 @@ const createTriggersQuery = `
         BEFORE UPDATE ON users
         FOR EACH ROW
         BEGIN
-            IF (SELECT COUNT(*) FROM users WHERE email = NEW.email OR username = NEW.username) > 0 THEN
+            IF (SELECT COUNT(*) FROM users WHERE email = NEW.email) > 0 THEN
                 SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Email or username already exists';
             END IF;
         END;
