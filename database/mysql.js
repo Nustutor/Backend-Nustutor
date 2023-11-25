@@ -1,6 +1,14 @@
 const mysql = require('mysql2')
 require('dotenv').config();
 
+const createTriggersQuery = require('./triggers');
+const createUserTable = require('./tables')
+
+// TODO: FOR PRODUCTION
+// https://stackoverflow.com/questions/56389698/why-super-privileges-are-disabled-when-binary-logging-option-is-on
+// Cannot enable triggers without super perms/binary logging, follow the above guide
+// TODO: END
+
 // for production environment, the env file will contain the database credentaials for RDS.
 // for development, the env file will contain the database credentials for local database.
 // for development, copy paste the content of ".env.example" to ".env".
@@ -12,7 +20,8 @@ const connection = mysql.createConnection({
     host: process.env.MYSQL_HOST,
     user: process.env.MYSQL_USER,
     password: process.env.MYSQL_PASSWORD,
-    database: process.env.MYSQL_DATABASE
+    database: process.env.MYSQL_DATABASE,
+    multipleStatements: true
 })
 
 
@@ -22,27 +31,28 @@ connection.connect((err) => {
         return;
     }
     console.log('Connected to MySQL');
-
-    // Check if tables exist and create them if they don't
-    createTables();
 });
 
-function createTables() {
-    const createUserTable = `
-        CREATE TABLE IF NOT EXISTS users (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            username VARCHAR(255) NOT NULL,
-            email VARCHAR(255) NOT NULL
-        )
-    `;
+
+createTablesAndTriggers();
+
+function createTablesAndTriggers() {
 
     connection.query(createUserTable, (err) => {
         if (err) {
-            console.error('Error creating users table:', err);
+            console.error('Error creating tables:', err);
         } else {
-            console.log('Users table created or already exists.');
+            console.log('Tables created or already exists.');
         }
     });
+
+    connection.query(createTriggersQuery, (err) => {
+        if (err) {
+            console.error('Error creating triggers:', err);
+        } else {
+            console.log('Triggers created or already exists.');
+        }
+    })
 }
 
 module.exports = connection;
