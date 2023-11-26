@@ -6,6 +6,10 @@ const nodemailer = require('nodemailer');
 const crypto = require('crypto');
 require('dotenv').config();
 
+
+
+
+// ADD USER AND SEND VERIFICATION EMAIL
 router.post('/', async (req, res) => {
     try {
         const { username, email, password, firstname, lastname, semester, degree, dept, bio } = req.body;
@@ -40,8 +44,6 @@ router.post('/', async (req, res) => {
 
         const verificationLink = "http://localhost:3000/verifyEmail/" + emailVerificationCode + "/" + email;
         const emailHTML = await ejs.renderFile('verificationEmail.ejs', { firstname, verificationLink });
-
-
         const transporter = nodemailer.createTransport({
             service: 'Gmail',
             auth: {
@@ -50,16 +52,26 @@ router.post('/', async (req, res) => {
             },
         });
 
-        const sendVerificationMail = (user) => {
-            const mailOptions = {
-                from: process.env.EMAIL,
-                to: email,
-                subject: 'Email Verification for Nustutor',
-                html: emailHTML
 
-
-            }
+        const mailOptions = {
+            from: process.env.EMAIL,
+            to: email,
+            subject: 'Email Verification for Nustutor',
+            html: emailHTML
         }
+
+
+        transporter.sendMail(mailOptions, (error, result) => {
+            if (error) {
+                res.status(500).json({ error: 'Internal Server Error when sending verification mail', error });
+            }
+            else {
+                res.status(200).json({ message: 'Verification email sent successfully', result });
+            }
+        })
+
+
+
 
 
     } catch (error) {
@@ -67,5 +79,33 @@ router.post('/', async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
+
+
+
+// VERIFY SIGNUP
+router.get('/verifyEmail/:emailVerificationCode/:email', async (req, res) => {
+    const verificationCode = req.params.emailVerificationCode
+    const email = req.params.email;
+    try {
+        const verifyEmailQuery = `
+        UPDATE users
+        SET verifiedEmail = true
+        WHERE emailVerificationCode = ? AND email = ?
+        `
+        db.query(verifyEmailQuery, [verificationCode, email], (err, results) => {
+            if (err) {
+                console.error('Error verifying email:', err);
+                res.status(500).json({ error: 'Internal DB Server Error', err });
+            } else {
+                console.log('Email verified successfully');
+                res.status(201).json({ message: 'Email verified successfully' });
+            }
+        });
+    }
+    catch (error) {
+        res.status(500).json({ error: 'Internal Server Error when verifying email', err });
+    }
+
+})
 
 module.exports = router;
