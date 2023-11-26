@@ -13,6 +13,8 @@ CREATE TABLE IF NOT EXISTS users (
     dept VARCHAR(255),
     email VARCHAR(255),
     password_hash VARCHAR(255),
+    verifiedEmail bool,
+    emailVerificationCode VARCHAR(255),
     bio TEXT
 );
 

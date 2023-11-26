@@ -1,5 +1,5 @@
 const createTriggersQuery = `
-    CREATE TRIGGER insert_check_email_username_exists
+    CREATE TRIGGER IF NOT EXISTS insert_check_email_username_exists
         BEFORE INSERT ON users
         FOR EACH ROW
         BEGIN
@@ -8,7 +8,7 @@ const createTriggersQuery = `
             END IF;
         END;
 
-    CREATE TRIGGER update_check_email_username_exists
+    CREATE TRIGGER IF NOT EXISTS update_check_email_username_exists
         BEFORE UPDATE ON users
         FOR EACH ROW
         BEGIN
