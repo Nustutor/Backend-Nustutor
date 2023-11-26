@@ -47,9 +47,9 @@ function getVerificationEmailString(user, verificationLink) {
     <body>
         <div class="container">
             <h2>NUSTUTOR Email Verification</h2>
-            <p>Hi <%= user %>,</p>
+            <p>Hi ${user},</p>
             <p>Thank you for signing up with NUSTUTOR. To complete your registration, please click the link below to verify your email:</p>
-            <a class="verification-link" href="<%= verificationLink %>">Verify Your Email</a>
+            <a class="verification-link" href="${verificationLink}">Verify Your Email</a>
             <p>If you did not sign up for NUSTUTOR, please disregard this email.</p>
             <p>Best regards,<br>NUSTUTOR Team.</p>
         </div>

@@ -12,8 +12,10 @@ const createTriggersQuery = `
         BEFORE UPDATE ON users
         FOR EACH ROW
         BEGIN
+        IF NEW.verifiedEmail IS NULL THEN
             IF (SELECT COUNT(*) FROM users WHERE email = NEW.email) > 0 THEN
                 SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Email or username already exists';
+            END IF;
             END IF;
         END;
     `

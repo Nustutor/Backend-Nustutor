@@ -4,6 +4,8 @@ const bcrypt = require('bcrypt');
 const db = require('../database/mysql');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
+const getVerificationEmailString = require('../utils/verificationEmail');
+
 require('dotenv').config();
 
 
@@ -12,7 +14,7 @@ require('dotenv').config();
 // ADD USER AND SEND VERIFICATION EMAIL
 router.post('/', async (req, res) => {
     try {
-        const { username, email, password, firstname, lastname, semester, degree, dept, bio } = req.body;
+        const { email, password, firstname, lastname, semester, degree, dept, bio } = req.body;
 
         const saltRounds = 12
 
@@ -22,33 +24,39 @@ router.post('/', async (req, res) => {
 
         // Insert the new user into the 'users' table
         const insertUserQuery = `
-            INSERT INTO users (uuid, verifiedEmail,emailVerificationCode, username, email, password_hash, firstname, lastname, semester, degree, dept, bio)
-            VALUES (UUID_TO_BIN(UUID()), false ,?,  ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO users (uuid, verifiedEmail,emailVerificationCode, email, password_hash, firstname, lastname, semester, degree, dept, bio)
+            VALUES (UUID_TO_BIN(UUID()), false ,  ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
 
         db.query(
             insertUserQuery,
-            [emailVerificationCode, username, email, hashedPassword, firstname, lastname, semester, degree, dept, bio],
+            [emailVerificationCode, email, hashedPassword, firstname, lastname, semester, degree, dept, bio],
             (err, results) => {
                 if (err) {
                     console.error('Error creating user:', err);
-                    res.status(500).json({ error: 'Internal Server Error', err });
+                    return res.status(500).json({ error: 'Internal Server Error when creating user', err });
                 } else {
                     console.log('User created successfully');
-                    console.log('user data', results)
-                    res.status(201).json({ message: 'User created successfully' });
+                    console.log('user data', results);
                 }
             }
         );
 
-
         const verificationLink = "http://localhost:3000/verifyEmail/" + emailVerificationCode + "/" + email;
-        const emailHTML = await ejs.renderFile('verificationEmail.ejs', { firstname, verificationLink });
+        const emailHTML = getVerificationEmailString(firstname, verificationLink)
+
+
+        // see : https://www.youtube.com/watch?v=-rcRf7yswfM for OAuth2
+        // see : https://stackoverflow.com/questions/48854066/missing-credentials-for-plain-nodemailer
         const transporter = nodemailer.createTransport({
             service: 'Gmail',
             auth: {
+                type: 'OAuth2',
                 user: process.env.EMAIL,
-                pass: process.env.PASSWORD,
+                clientId: process.env.GOOGLE_CLIENT_ID,
+                clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+                refreshToken: process.env.GOOGLE_REFRESH_TOKEN,
+                // accessToken: process.env.GOOGLE_ACCESS_TOKEN,
             },
         });
 
@@ -61,44 +69,41 @@ router.post('/', async (req, res) => {
         }
 
 
-        transporter.sendMail(mailOptions, (error, result) => {
+        transporter.sendMail(mailOptions, async (error, result) => {
             if (error) {
-                res.status(500).json({ error: 'Internal Server Error when sending verification mail', error });
+                // res.status(500).json({ error: 'Internal Server Error when sending verification mail', error });
+                console.log("Error when sending verification email", error)
             }
             else {
-                res.status(200).json({ message: 'Verification email sent successfully', result });
+                console.log("Verification email sent successfully")
+                return res.status(201).json({ message: 'User created successfully and verification email sent' });
             }
         })
 
-
-
-
-
     } catch (error) {
         console.error('Error creating user:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
+        res.status(500).json({ error: 'Internal Server Error', error });
     }
 });
 
 
 
 // VERIFY SIGNUP
-router.get('/verifyEmail/:emailVerificationCode/:email', async (req, res) => {
+router.get('/verifyEmail/:emailVerificationCode/', async (req, res) => {
     const verificationCode = req.params.emailVerificationCode
-    const email = req.params.email;
     try {
         const verifyEmailQuery = `
         UPDATE users
         SET verifiedEmail = true
-        WHERE emailVerificationCode = ? AND email = ?
+        WHERE emailVerificationCode = ?
         `
-        db.query(verifyEmailQuery, [verificationCode, email], (err, results) => {
+        db.query(verifyEmailQuery, [verificationCode], (err, results) => {
             if (err) {
                 console.error('Error verifying email:', err);
                 res.status(500).json({ error: 'Internal DB Server Error', err });
             } else {
                 console.log('Email verified successfully');
-                res.status(201).json({ message: 'Email verified successfully' });
+                res.status(201).json({ message: 'Email verified successfully', results });
             }
         });
     }
