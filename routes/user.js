@@ -3,13 +3,13 @@ const router = express.Router();
 const db = require('../database/mysql');
 const auth = require('../middleware/jwtMiddleware')
 
-router.get('/:id', auth, async (req, res) => {
+router.get('/:uuid', auth, async (req, res) => {
     try {
-        const { id } = req.params;
+        const { uuid } = req.params;
         const getUserQuery = `
             SELECT * FROM users WHERE uuid = UUID_TO_BIN(?)
         `
-        db.query(getUserQuery, [id], (err, results) => {
+        db.query(getUserQuery, [uuid], (err, results) => {
             if (err) {
                 console.error('Error getting tutor:', err);
                 return res.status(500).json({ error: 'Internal Server Error when getting tutor', err });

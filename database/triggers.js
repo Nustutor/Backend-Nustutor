@@ -18,6 +18,15 @@ const createTriggersQuery = `
             END IF;
             END IF;
         END;
+
+        CREATE TRIGGER IF NOT EXISTS insert_check_uuid_exists
+        BEFORE INSERT ON tutors
+        FOR EACH ROW
+        BEGIN
+            IF (SELECT COUNT(*) FROM tutors WHERE uuid = NEW.uuid) > 0 THEN
+                SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'UUID already exists';
+            END IF;
+        END;
     `
 
 module.exports = createTriggersQuery;

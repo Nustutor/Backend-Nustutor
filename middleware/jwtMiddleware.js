@@ -18,12 +18,19 @@ module.exports = function (req, res, next) {
                 console.log("error here")
                 return res.status(403).json({ message: 'Error when verifying token.' });
             }
-            console.log(decoded)
-            // Check if the decoded user ID matches the requested ID
-            if (req.params.id !== decoded.userId) {
 
-                return res.status(403).json({ message: 'Unauthorized: Token does not match user ID' });
-            }
+            // Check if the decoded user ID matches the requested ID
+            // if (req.params.uuid != null) {
+            //     if (req.params.uuid !== decoded.userId) {
+            //         return res.status(403).json({ message: 'Unauthorized: Token does not match user ID' });
+            //     }
+            // }
+            // else if (req.body.uuid != null) {
+            //     if (req.body.uuid !== decoded.userId) {
+            //         return res.status(403).json({ message: 'Unauthorized: Token does not match user ID' });
+            //     }
+            // }
+
 
             req.user = decoded;
             next();

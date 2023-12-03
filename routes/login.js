@@ -2,9 +2,7 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const db = require('../database/mysql');
-const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
-const { type } = require('os');
 
 
 require('dotenv').config();
@@ -52,6 +50,7 @@ router.post('/', async (req, res) => {
             }
 
             const token = jwt.sign({ userId: result[0].uuid }, SECRET_KEY, { expiresIn: '48h' });
+
             return res.json({ userID: result[0].uuid, token: token });
         });
 

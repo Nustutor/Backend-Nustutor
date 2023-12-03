@@ -33,7 +33,8 @@ CREATE TABLE IF NOT EXISTS tutorReviews (
 CREATE TABLE IF NOT EXISTS tutorLinks (
     luid BINARY(16) PRIMARY KEY,
     tuid BINARY(16) REFERENCES tutors(tuid),
-    link TEXT
+    link TEXT,
+    platform TEXT
 );
 
 CREATE TABLE IF NOT EXISTS subjects (
