@@ -7,10 +7,12 @@ app.use(express.urlencoded({ extended: true }))
 
 const userRoute = require('./routes/user');
 const signUpRoute = require('./routes/signup');
+const loginRoute = require('./routes/login');
 
 
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/signup", signUpRoute);
+app.use("/api/v1/login", loginRoute);
 
 
 app.get("/api/v1/test", (req, res) => {
