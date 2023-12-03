@@ -20,11 +20,20 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE TABLE IF NOT EXISTS tutors (
     tuid BINARY(16) PRIMARY KEY,
-    uuid BINARY(16) REFERENCES users(uuid),
-    link JSON,
-    profilePicture BLOB,
-    tutorBio TEXT,
-    reviews JSON
+    uuid BINARY(16) REFERENCES users(uuid)
+);
+
+CREATE TABLE IF NOT EXISTS tutorReviews (
+    ruid BINARY(16) PRIMARY KEY,
+    tuid BINARY(16) REFERENCES tutors(tuid),
+    review TEXT,
+    rating INT
+);
+
+CREATE TABLE IF NOT EXISTS tutorLinks (
+    luid BINARY(16) PRIMARY KEY,
+    tuid BINARY(16) REFERENCES tutors(tuid),
+    link TEXT
 );
 
 CREATE TABLE IF NOT EXISTS subjects (

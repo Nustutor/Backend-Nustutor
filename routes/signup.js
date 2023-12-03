@@ -10,6 +10,29 @@ require('dotenv').config();
 
 
 
+// VERIFY SIGNUP
+router.get('/verifyEmail/:emailVerificationCode/', async (req, res) => {
+    const verificationCode = req.params.emailVerificationCode
+    try {
+        const verifyEmailQuery = `
+        UPDATE users
+        SET verifiedEmail = true
+        WHERE emailVerificationCode = ?
+        `
+        db.query(verifyEmailQuery, [verificationCode], (err, results) => {
+            if (err) {
+                console.error('Error verifying email:', err);
+                res.status(500).json({ error: 'Internal DB Server Error', err });
+            } else {
+                console.log('Email verified successfully');
+                res.status(201).json({ message: 'Email verified successfully', results });
+            }
+        });
+    }
+    catch (error) {
+        res.status(500).json({ error: 'Internal Server Error when verifying email', err });
+    }
+})
 
 // ADD USER AND SEND VERIFICATION EMAIL
 router.post('/', async (req, res) => {
@@ -45,7 +68,6 @@ router.post('/', async (req, res) => {
         const verificationLink = "http://localhost:3000/verifyEmail/" + emailVerificationCode + "/" + email;
         const emailHTML = getVerificationEmailString(firstname, verificationLink)
 
-
         // see : https://www.youtube.com/watch?v=-rcRf7yswfM for OAuth2
         // see : https://stackoverflow.com/questions/48854066/missing-credentials-for-plain-nodemailer
         const transporter = nodemailer.createTransport({
@@ -60,7 +82,6 @@ router.post('/', async (req, res) => {
             },
         });
 
-
         const mailOptions = {
             from: process.env.EMAIL,
             to: email,
@@ -68,18 +89,28 @@ router.post('/', async (req, res) => {
             html: emailHTML
         }
 
-
         transporter.sendMail(mailOptions, async (error, result) => {
             if (error) {
                 // res.status(500).json({ error: 'Internal Server Error when sending verification mail', error });
                 console.log("Error when sending verification email", error)
+                const deleteUserQuery = `
+                DELETE FROM users WHERE email = ?
+                `
+                db.query(deleteUserQuery, [email], (err, results) => {
+                    if (err) {
+                        return res.status(500).json({ error: 'Error deleting user when verification email not sent. ', err });
+                    } else {
+                        console.log('User deleted successfully after verification email not sent.', results);
+                        return res.status(500).json({ error: 'Internal Server Error when sending verification mail', error });
+                    }
+                })
+
             }
             else {
                 console.log("Verification email sent successfully")
                 return res.status(201).json({ message: 'User created successfully and verification email sent' });
             }
         })
-
     } catch (error) {
         console.error('Error creating user:', error);
         res.status(500).json({ error: 'Internal Server Error', error });
@@ -87,30 +118,5 @@ router.post('/', async (req, res) => {
 });
 
 
-
-// VERIFY SIGNUP
-router.get('/verifyEmail/:emailVerificationCode/', async (req, res) => {
-    const verificationCode = req.params.emailVerificationCode
-    try {
-        const verifyEmailQuery = `
-        UPDATE users
-        SET verifiedEmail = true
-        WHERE emailVerificationCode = ?
-        `
-        db.query(verifyEmailQuery, [verificationCode], (err, results) => {
-            if (err) {
-                console.error('Error verifying email:', err);
-                res.status(500).json({ error: 'Internal DB Server Error', err });
-            } else {
-                console.log('Email verified successfully');
-                res.status(201).json({ message: 'Email verified successfully', results });
-            }
-        });
-    }
-    catch (error) {
-        res.status(500).json({ error: 'Internal Server Error when verifying email', err });
-    }
-
-})
 
 module.exports = router;

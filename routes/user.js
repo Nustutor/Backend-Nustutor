@@ -1,36 +1,28 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../database/mysql');
+const auth = require('../middleware/jwtMiddleware')
 
-router.get('/all', async (req, res) => {
-    // Your SQL query goes here
-    const sqlQuery = 'SELECT * FROM users';
-
-    db.query(sqlQuery, (err, results) => {
-        if (err) {
-            console.error('Error executing SQL query:', err);
-            res.status(500).json({ error: 'Internal Server Error' });
-            return;
-        }
-
-        res.json(results);
-    });
+router.get('/:id', auth, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const getUserQuery = `
+            SELECT * FROM users WHERE uuid = UUID_TO_BIN(?)
+        `
+        db.query(getUserQuery, [id], (err, results) => {
+            if (err) {
+                console.error('Error getting tutor:', err);
+                return res.status(500).json({ error: 'Internal Server Error when getting tutor', err });
+            }
+            res.status(200).json({ results })
+        })
+    }
+    catch (error) {
+        res.status(500).json({ error: 'Internal Server Error when getting tutor' })
+    }
 });
 
-router.get('/all/:id', async (req, res) => {
-    // Your SQL query goes here
-    const sqlQuery = 'SELECT * FROM users where id=';
 
-    db.query(sqlQuery, (err, results) => {
-        if (err) {
-            console.error('Error executing SQL query:', err);
-            res.status(500).json({ error: 'Internal Server Error' });
-            return;
-        }
-
-        res.json(results);
-    });
-});
 
 
 
