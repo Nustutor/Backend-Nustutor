@@ -1,11 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const bcrypt = require('bcrypt');
 const db = require('../database/mysql');
-const nodemailer = require('nodemailer');
-const crypto = require('crypto');
-const getVerificationEmailString = require('../utils/verificationEmail');
-const jwt = require('jsonwebtoken')
 const auth = require('../middleware/jwtMiddleware')
 const validator = require('validator')
 
@@ -26,7 +21,11 @@ router.get('/gettutor/:uuid', auth, async (req, res) => {
                 console.error('Error getting tutor:', err);
                 return res.status(500).json({ error: 'Internal Server Error when getting tutor', err });
             }
-            res.status(200).json({ results })
+            if (results.length === 0) {
+                return res.status(404).json({ message: 'No tutor found for this user id' });
+            } else {
+                res.status(200).json({ results })
+            }
         })
     }
     catch (error) {
@@ -34,12 +33,32 @@ router.get('/gettutor/:uuid', auth, async (req, res) => {
     }
 })
 
-// router.get('/getTutorLinks/:tuid', auth, async (req, res) => {
-//     const { tuid } = req.params;
-//     const getLinksQuery = `
-//         SELECT * FROM tutorLinks WHERE tuid = UUID_TO_BIN(?)
-//     `
-// })
+router.get('/gettutorlinks/:tuid', auth, async (req, res) => {
+    try {
+        const { tuid } = req.params;
+        if (!validator.isUUID(tuid)) {
+            return res.status(404).json({ message: 'Unauthorized: User ID is incorrect.' });
+        }
+        const getLinksQuery = `
+        SELECT BIN_TO_UUID(luid) as luid, BIN_TO_UUID(tuid) as tuid, link, platform FROM tutorLinks WHERE tuid = UUID_TO_BIN(?)
+    `
+        db.query(getLinksQuery, [tuid], (err, results) => {
+            if (err) {
+                console.error('Error getting tutor links:', err);
+                return res.status(500).json({ error: 'Internal Server Error when getting tutor links', err });
+            }
+            if (results.length === 0) {
+                return res.status(404).json({ message: 'No links found for this tutor' });
+            } else {
+                res.status(200).json({ results })
+            }
+        })
+    }
+    catch (error) {
+        res.status(500).json({ error: 'Internal Server Error when getting tutor links', error })
+
+    }
+})
 
 
 //SIGN UP AS A TUTOR
@@ -48,8 +67,6 @@ router.post('/signup/', auth, async (req, res) => {
         const createTutorAccountQuery = `INSERT INTO tutors (tuid, uuid) 
                                         VALUES (UUID_TO_BIN(UUID()), UUID_TO_BIN(?))`;
         const { uuid } = req.body;
-        console.log(req.body)
-        console.log(uuid)
         db.query(createTutorAccountQuery, [uuid], (err, results) => {
             if (err) {
                 console.error('Error creating tutor account:', err);
