@@ -15,8 +15,7 @@ router.post('/', async (req, res) => {
 
         const getUser = `
             SELECT BIN_TO_UUID(uuid) as uuid,
-            firstname,
-            lastname,
+            fullname,
             semester,
             degree,
             dept,
