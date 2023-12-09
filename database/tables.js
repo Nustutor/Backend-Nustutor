@@ -6,8 +6,7 @@
 const createUserTable = `
 CREATE TABLE IF NOT EXISTS users (
     uuid BINARY(16) PRIMARY KEY,
-    firstname VARCHAR(255),
-    lastname VARCHAR(255),
+    fullname VARCHAR(255),
     semester INT,
     degree VARCHAR(255),
     dept VARCHAR(255),
