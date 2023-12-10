@@ -8,11 +8,16 @@ const validator = require('validator')
 require('dotenv').config();
 
 
-router.get('/gettutor/:uuid', auth, async (req, res) => {
+
+
+router.get('/gettutor/:tuid', auth, async (req, res) => {
     try {
-        const { uuid } = req.params;
+        const { uuid } = req.headers;
+        if (!validator.isUUID(uuid)) {
+            return res.status(404).json({ message: 'Unauthorized: User ID is incorrect.' });
+        }
         const getUserQuery = `
-            SELECT DISTINCT users.firstname, users.lastname, users.semester, users.degree, users.dept, users.bio, users.email, BIN_TO_UUID(tutors.tuid) as tuid
+            SELECT DISTINCT users.fullname, users.semester, users.degree, users.dept, users.bio, users.email, BIN_TO_UUID(tutors.tuid) as tuid
             FROM users, tutors, tutorLinks
             WHERE tutors.uuid = UUID_TO_BIN(?) AND users.uuid = UUID_TO_BIN(?)
         `
@@ -66,13 +71,19 @@ router.post('/signup/', auth, async (req, res) => {
     try {
         const createTutorAccountQuery = `INSERT INTO tutors (tuid, uuid) 
                                         VALUES (UUID_TO_BIN(UUID()), UUID_TO_BIN(?))`;
-        const { uuid } = req.body;
+        const { uuid } = req.headers;
+        if (!validator.isUUID(uuid)) {
+            return res.status(404).json({ message: 'Unauthorized: User ID does not exist.' });
+        }
+        if (uuid !== req.user.userId) {
+            return res.status(403).json({ message: 'Unauthorized: Token does not match user ID' });
+        }
         db.query(createTutorAccountQuery, [uuid], (err, results) => {
             if (err) {
                 console.error('Error creating tutor account:', err);
                 return res.status(500).json({ error: 'Internal Server Error when creating tutor account', err });
             }
-            res.status(201).json({ results })
+            return res.status(201).json({ message: 'Tutor account created successfully' })
         })
     }
     catch (error) {
@@ -83,7 +94,6 @@ router.post('/signup/', auth, async (req, res) => {
 // LETS THE TUTOR ADD SOCIAL LINKS TO THEIR ACCOUNTS
 router.post('/addLinks', auth, async (req, res) => {
     try {
-        let uuidExist = true;
         const { tuid, link, platform } = req.body;
         if (!validator.isUUID(tuid)) {
             return res.status(404).json({ message: 'Unauthorized: User ID does not exist.' });
@@ -95,7 +105,6 @@ router.post('/addLinks', auth, async (req, res) => {
                 return res.status(500).json({ error: 'Internal Server Error when fetching uuid from tuid', err });
             }
             if (results[0].uuid !== req.user.userId) {
-                uuidExist = false;
                 return res.status(403).json({ message: 'Unauthorized: Token does not match user ID' });
             }
             else {
@@ -121,6 +130,43 @@ router.post('/addLinks', auth, async (req, res) => {
 
 })
 
+
+
+router.post('/addclass', auth, async (req, res) => {
+    try {
+        const { tuid } = req.headers;
+        const { suid, title, description, rate, multipleStudents, availableTimeslots } = req.body;
+        if (!validator.isUUID(tuid) || !validator.isUUID(suid)) {
+            return res.status(404).json({ message: 'Unauthorized: User / Subject ID does not exist.' });
+        }
+        // Check if the decoded user ID matches the requested ID
+        const fetchUUIDquery = 'SELECT BIN_TO_UUID(uuid) as uuid FROM tutors WHERE tuid = UUID_TO_BIN(?)'
+        db.query(fetchUUIDquery, [tuid], (err, results) => {
+            if (err) {
+                return res.status(500).json({ error: 'Internal Server Error when fetching uuid from tuid', err });
+            }
+            if (results[0].uuid !== req.user.userId) {
+                uuidExist = false;
+                return res.status(403).json({ message: 'Unauthorized: Token does not match user ID' });
+            }
+            else {
+                const addClassQuery = `INSERT INTO classOffered (tuid, cuid, suid, title, description, rate, multipleStudents, availableTimeslots)
+                VALUES (UUID_TO_BIN(?), UUID_TO_BIN(UUID()), UUID_TO_BIN(?), ?, ?, ?, ?, ?)`;
+                db.query(addClassQuery, [tuid, suid, title, description, rate, multipleStudents, availableTimeslots], (err, results) => {
+                    if (err) {
+                        console.error('Error adding class:', err);
+                        return res.status(500).json({ error: 'Internal Server Error when adding class', err });
+                    }
+                    console.log("Class added")
+                    return res.status(201).json({ "Class added:": results })
+                })
+            }
+        })
+    }
+    catch (error) {
+        res.status(500).json({ error: 'Internal Server Error when adding class' })
+    }
+})
 
 
 module.exports = router;

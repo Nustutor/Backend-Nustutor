@@ -13,9 +13,9 @@ module.exports = function (req, res, next) {
     try {
 
         jwt.verify(token, SECRET_KEY, (err, decoded) => {
-            console.log(token)
+
             if (err) {
-                console.log("error here")
+
                 return res.status(403).json({ message: 'Error when verifying token.' });
             }
 

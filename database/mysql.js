@@ -3,6 +3,7 @@ require('dotenv').config();
 
 const createTriggersQuery = require('./triggers');
 const createUserTable = require('./tables')
+const createSubjectsQuery = require('./subject_dump')
 
 // TODO: FOR PRODUCTION
 // https://stackoverflow.com/questions/56389698/why-super-privileges-are-disabled-when-binary-logging-option-is-on
@@ -51,6 +52,14 @@ function createTablesAndTriggers() {
             console.error('Error creating triggers:', err);
         } else {
             console.log('Triggers created or already exists.');
+        }
+    })
+
+    connection.query(createSubjectsQuery, (err) => {
+        if (err) {
+            console.error('Error creating subjects:', err);
+        } else {
+            console.log('Subjects created or already exists.');
         }
     })
 }
