@@ -12,12 +12,14 @@ const userRoute = require('./routes/user');
 const signUpRoute = require('./routes/signup');
 const loginRoute = require('./routes/login');
 const tutorRoute = require('./routes/tutor')
+const subjectRoute = require('./routes/subject')
 
 
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/signup", signUpRoute);
 app.use("/api/v1/login", loginRoute);
 app.use("/api/v1/tutor", tutorRoute);
+app.use("/api/v1/subject", subjectRoute);
 
 
 app.get("/api/v1/test", (req, res) => {
