@@ -5,27 +5,27 @@ const db = require('../database/mysql');
 const auth = require('../middleware/jwtMiddleware')
 const validator = require('validator')
 
-
-
-
-router.get('/getofferedclasses/:tuid', auth, async (req, res) => {
-    //get all classes offered
+router.get('/subjectclasses/:suid', auth, async (req, res) => {
+    //get all classes of a subject
     try {
-        if (req.params.tuid != undefined) {
+        const { suid } = req.params;
+        if (!validator.isUUID(suid) || !validator.isUUID(req.headers.uuid)) {
+            return res.status(404).json({ message: 'Unauthorized: Subject ID/User UUID is incorrect.' });
         }
-        const getClassesQuery = `
-            SELECT BIN_TO_UUID(cuid) as cuid, BIN_TO_UUID(tuid) as tuid, BIN_TO_UUID(suid) as suid, title, description, rate, multipleStudents, availableTimeslots FROM classOffered
-            WHERE 
+        const getSubjectClassesQuery = `
+            SELECT BIN_TO_UUID(cuid) as cuid, BIN_TO_UUID(tuid) as tuid, BIN_TO_UUID(suid) as suid, title, description, rate, multipleStudents, availableTimeslots 
+            FROM classOffered
+            WHERE suid = UUID_TO_BIN(?)
         `
-        db.query(getClassesQuery, (err, results) => {
+        db.query(getSubjectClassesQuery, [suid], (err, results) => {
             if (err) {
                 console.error('Error getting classes:', err);
                 return res.status(500).json({ error: 'Internal Server Error when getting classes', err });
             }
             if (results.length === 0) {
-                return res.status(404).json({ message: 'No classes found' });
+                return res.status(404).json({ message: 'No classes found for this subject' });
             } else {
-                res.status(200).json({ results })
+                res.status(200).json(results)
             }
         })
     }
@@ -33,6 +33,7 @@ router.get('/getofferedclasses/:tuid', auth, async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error when getting classes' })
     }
 })
+
 
 router.post('/addclass', auth, async (req, res) => {
     try {

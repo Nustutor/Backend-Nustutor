@@ -5,31 +5,32 @@ const auth = require('../middleware/jwtMiddleware')
 const validator = require('validator')
 
 
-router.get('/subjecttutors/:suid', auth, async (req, res) => {
-    //get all tutor classes of a subject
+router.get('/getofferedclasses/:tuid', auth, async (req, res) => {
+    //get all classes offered
     try {
-        const { suid } = req.params;
-        if (!validator.isUUID(suid)) {
-            return res.status(404).json({ message: 'Unauthorized: Subject ID is incorrect.' });
+        const { tuid } = req.params;
+        const { uuid } = req.headers;
+        if (!validator.isUUID(uuid) || !validator.isUUID(tuid)) {
+            return res.status(404).json({ message: 'Unauthorized: User ID/Tutor ID is incorrect.' });
         }
-        const getTutorClassesQuery = `
+        const getClassesQuery = `
             SELECT BIN_TO_UUID(cuid) as cuid, BIN_TO_UUID(tuid) as tuid, BIN_TO_UUID(suid) as suid, title, description, rate, multipleStudents, availableTimeslots FROM classOffered
-            WHERE suid = UUID_TO_BIN(?)
+            WHERE  tuid = UUID_TO_BIN(?)
         `
-        db.query(getTutorClassesQuery, [suid], (err, results) => {
+        db.query(getClassesQuery, [tuid], (err, results) => {
             if (err) {
-                console.error('Error getting tutor classes:', err);
-                return res.status(500).json({ error: 'Internal Server Error when getting tutor classes', err });
+                console.error('Error getting classes:', err);
+                return res.status(500).json({ error: 'Internal Server Error when getting classes' + err });
             }
             if (results.length === 0) {
-                return res.status(404).json({ message: 'No tutor classes found for this subject' });
+                return res.status(404).json({ message: 'No classes found for this tutor' });
             } else {
-                res.status(200).json({ results })
+                res.status(200).json(results)
             }
         })
     }
     catch (error) {
-        res.status(500).json({ error: 'Internal Server Error when getting tutor classes' })
+        res.status(500).json({ error: 'Internal Server Error when getting classes ' + error })
     }
 })
 
