@@ -17,8 +17,8 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            exit
-            whoami
+            export NVM_DIR=~/.nvm
+            source ~/.nvm/nvm.sh
             cd ${{ secrets.EC2_PATH }}
             pm2 stop app.js
             npm install
