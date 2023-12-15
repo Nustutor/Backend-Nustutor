@@ -18,5 +18,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd ${{ secrets.EC2_PATH }}
+            pm2 stop app.js
             npm install
             git pull origin main
+            pm2 start app.js
