@@ -25,8 +25,7 @@ app.use("/api/v1/class", classRoute);
 
 
 app.get("/api/v1/test", (req, res) => {
-    console.log("Test endpoint hit! ");
-    res.json({ message: "Express application for Nustutor running!" });
+    res.json({ message: "Express application for Nustutor running (test)!" });
 })
 
 app.listen(port, () => {
