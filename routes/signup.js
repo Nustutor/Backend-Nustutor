@@ -36,7 +36,7 @@ router.get('/verifyEmail/:emailVerificationCode/', async (req, res) => {
         });
     }
     catch (error) {
-        res.status(500).json({ error: 'Internal Server Error when verifying email', err });
+        res.status(500).json({ error: 'Internal Server Error when verifying email' + err });
     }
 })
 
