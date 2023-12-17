@@ -63,7 +63,7 @@ router.post('/', async (req, res) => {
             (err, results) => {
                 if (err) {
                     console.error('Error creating user:', err);
-                    return res.status(500).json({ error: 'Internal Server Error when creating user', err });
+                    return res.status(500).json({ error: 'Internal Server Error when creating user' + err });
                 } else {
                     console.log('User created successfully');
                     console.log('user data', results);
@@ -94,13 +94,13 @@ router.post('/', async (req, res) => {
                     transporter.sendMail(mailOptions, async (mailError, result) => {
                         if (mailError) {
                             // res.status(500).json({ error: 'Internal Server Error when sending verification mail', error });
-                            console.log("Error when sending verification email", mailError)
+                            console.log("Error when sending verification email" + mailError)
                             const deleteUserQuery = `
                             DELETE FROM users WHERE email = ?
                             `
 
                             db.query(deleteUserQuery, [email])
-                            return res.status(500).json({ error: 'Internal Server Error when sending verification mail', mailError });
+                            return res.status(500).json({ error: 'Internal Server Error when sending verification mail' + mailError });
 
                         }
                         else {
