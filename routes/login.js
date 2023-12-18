@@ -30,8 +30,8 @@ router.post('/', async (req, res) => {
 
         db.query(getUser, [email], async (err, result) => {
             if (err) {
-                console.error('Error getting user:', err);
-                return res.status(500).json({ error: 'Internal Server Error when getting user', err });
+                console.error('Error getting user:' + err);
+                return res.status(500).json({ error: 'Internal Server Error when getting user' + err });
             }
 
             if (result.length === 0) {

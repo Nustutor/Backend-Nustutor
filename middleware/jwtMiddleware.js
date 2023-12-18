@@ -36,6 +36,6 @@ module.exports = function (req, res, next) {
             next();
         });
     } catch (error) {
-        res.status(500).json({ error: 'Internal Server Error when verifying token', error });
+        res.status(500).json({ error: 'Internal Server Error when verifying token' + err });
     }
 };

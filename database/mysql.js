@@ -28,7 +28,7 @@ const connection = mysql.createConnection({
 
 connection.connect((err) => {
     if (err) {
-        console.error('Error connecting to MySQL:', err);
+        console.error('Error connecting to MySQL:' + err);
         return;
     }
     console.log('Connected to MySQL');
@@ -41,7 +41,7 @@ function createTablesAndTriggers() {
 
     connection.query(createUserTable, (err) => {
         if (err) {
-            console.error('Error creating tables:', err);
+            console.error('Error creating tables:' + err);
         } else {
             console.log('Tables created or already exists.');
         }
@@ -49,7 +49,7 @@ function createTablesAndTriggers() {
 
     connection.query(createTriggersQuery, (err) => {
         if (err) {
-            console.error('Error creating triggers:', err);
+            console.error('Error creating triggers:' + err);
         } else {
             console.log('Triggers created or already exists.');
         }
@@ -57,7 +57,7 @@ function createTablesAndTriggers() {
 
     connection.query(createSubjectsQuery, (err) => {
         if (err) {
-            console.error('Error creating subjects:', err);
+            console.error('Error creating subjects:' + err);
         } else {
             console.log('Subjects created or already exists.');
         }

@@ -14,8 +14,8 @@ router.get('/', auth, async (req, res) => {
         `
         db.query(getSubjectsQuery, (err, results) => {
             if (err) {
-                console.error('Error getting subjects:', err);
-                return res.status(500).json({ error: 'Internal Server Error when getting subjects', err });
+                console.error('Error getting subjects:' + err);
+                return res.status(500).json({ error: 'Internal Server Error when getting subjects' + err });
             }
             if (results.length === 0) {
                 return res.status(404).json({ message: 'No subjects found' });
@@ -41,8 +41,8 @@ router.get('/subjectid/:suid', auth, async (req, res) => {
         `
         db.query(getSubjectQuery, [suid], (err, results) => {
             if (err) {
-                console.error('Error getting subject:', err);
-                return res.status(500).json({ error: 'Internal Server Error when getting subject', err });
+                console.error('Error getting subject:' + err);
+                return res.status(500).json({ error: 'Internal Server Error when getting subject' + err });
             }
             if (results.length === 0) {
                 return res.status(404).json({ message: 'No subject found for this id' });
@@ -64,8 +64,8 @@ router.get('/degrees/', auth, async (req, res) => {
         `
         db.query(getDegreeQuery, [], (err, results) => {
             if (err) {
-                console.error('Error getting degree:', err);
-                return res.status(500).json({ error: 'Internal Server Error when getting degree', err });
+                console.error('Error getting degree:' + err);
+                return res.status(500).json({ error: 'Internal Server Error when getting degree' + err });
             }
             if (results.length === 0) {
                 return res.status(404).json({ message: 'No degrees available' });
@@ -89,8 +89,8 @@ router.get('/degree_subjects', auth, async (req, res) => {
         `
         db.query(getCourseQuery, [degree], (err, results) => {
             if (err) {
-                console.error('Error getting course:', err);
-                return res.status(500).json({ error: 'Internal Server Error when getting course', err });
+                console.error('Error getting course:' + err);
+                return res.status(500).json({ error: 'Internal Server Error when getting course' + err });
             }
             if (results.length === 0) {
                 return res.status(404).json({ message: 'No courses found for this degree' });
@@ -124,8 +124,8 @@ router.get('/search/', auth, async (req, res) => {
         // Search by name
         db.query(getCourseQuery, [`%${search_term}%`, '', '', ''], (err, results) => {
             if (err) {
-                console.error('Error getting course:', err);
-                return res.status(500).json({ error: 'Internal Server Error when getting course', err });
+                console.error('Error getting course:' + err);
+                return res.status(500).json({ error: 'Internal Server Error when getting course' + err });
             }
 
             // If results are found by name, return them
@@ -136,8 +136,8 @@ router.get('/search/', auth, async (req, res) => {
             // If no results by name, search by class offered title
             db.query(getCourseQuery, ['', '', '', `%${search_term}%`], (err, results) => {
                 if (err) {
-                    console.error('Error getting course:', err);
-                    return res.status(500).json({ error: 'Internal Server Error when getting course', err });
+                    console.error('Error getting course:' + err);
+                    return res.status(500).json({ error: 'Internal Server Error when getting course' + err });
                 }
 
                 // If results are found by class offered title, return them
@@ -148,8 +148,8 @@ router.get('/search/', auth, async (req, res) => {
                 // If no results by name or class offered title, search by degree
                 db.query(getCourseQuery, ['', '', `%${search_term}%`, ''], (err, results) => {
                     if (err) {
-                        console.error('Error getting course:', err);
-                        return res.status(500).json({ error: 'Internal Server Error when getting course', err });
+                        console.error('Error getting course:' + err);
+                        return res.status(500).json({ error: 'Internal Server Error when getting course' + err });
                     }
 
                     // If results are found by degree return them
@@ -159,8 +159,8 @@ router.get('/search/', auth, async (req, res) => {
                     // finally search by code
                     db.query(getCourseQuery, ['', `%${search_term}%`, '', ''], (err, results) => {
                         if (err) {
-                            console.error('Error getting course:', err);
-                            return res.status(500).json({ error: 'Internal Server Error when getting course', err });
+                            console.error('Error getting course:' + err);
+                            return res.status(500).json({ error: 'Internal Server Error when getting course' + err });
                         }
 
                         // If results are found by code return them

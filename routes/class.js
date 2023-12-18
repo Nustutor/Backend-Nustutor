@@ -19,8 +19,8 @@ router.get('/subjectclasses/:suid', auth, async (req, res) => {
         `
         db.query(getSubjectClassesQuery, [suid], (err, results) => {
             if (err) {
-                console.error('Error getting classes:', err);
-                return res.status(500).json({ error: 'Internal Server Error when getting classes', err });
+                console.error('Error getting classes:' + err);
+                return res.status(500).json({ error: 'Internal Server Error when getting classes' + err });
             }
             if (results.length === 0) {
                 return res.status(404).json({ message: 'No classes found for this subject' });
@@ -46,7 +46,7 @@ router.post('/addclass', auth, async (req, res) => {
         const fetchUUIDquery = 'SELECT BIN_TO_UUID(uuid) as uuid FROM tutors WHERE tuid = UUID_TO_BIN(?)'
         db.query(fetchUUIDquery, [tuid], (err, results) => {
             if (err) {
-                return res.status(500).json({ error: 'Internal Server Error when fetching uuid from tuid', err });
+                return res.status(500).json({ error: 'Internal Server Error when fetching uuid from tuid' + err });
             }
             if (results[0].uuid !== req.user.userId) {
                 return res.status(403).json({ message: 'Unauthorized: Token does not match user ID' });
@@ -56,8 +56,8 @@ router.post('/addclass', auth, async (req, res) => {
                 VALUES (UUID_TO_BIN(?), UUID_TO_BIN(UUID()), UUID_TO_BIN(?), ?, ?, ?, ?, ?)`;
                 db.query(addClassQuery, [tuid, suid, title, description, rate, multipleStudents, availableTimeslots], (err, results) => {
                     if (err) {
-                        console.error('Error adding class:', err);
-                        return res.status(500).json({ error: 'Internal Server Error when adding class', err });
+                        console.error('Error adding class:' + err);
+                        return res.status(500).json({ error: 'Internal Server Error when adding class' + err });
                     }
                     console.log("Class added")
                     return res.status(201).json({ "Class added:": results })

@@ -11,8 +11,8 @@ router.get('/:uuid', auth, async (req, res) => {
         `
         db.query(getUserQuery, [uuid], (err, results) => {
             if (err) {
-                console.error('Error getting tutor:', err);
-                return res.status(500).json({ error: 'Internal Server Error when getting tutor', err });
+                console.error('Error getting tutor:' + err);
+                return res.status(500).json({ error: 'Internal Server Error when getting tutor' + err });
             }
             res.status(200).json({ results })
         })

@@ -19,7 +19,7 @@ router.get('/getofferedclasses/:tuid', auth, async (req, res) => {
         `
         db.query(getClassesQuery, [tuid], (err, results) => {
             if (err) {
-                console.error('Error getting classes:', err);
+                console.error('Error getting classes:' + err);
                 return res.status(500).json({ error: 'Internal Server Error when getting classes' + err });
             }
             if (results.length === 0) {
@@ -50,8 +50,8 @@ router.get('/tutorview/gettutor/', auth, async (req, res) => {
         `
         db.query(getTutorAccountQuery, [uuid], (err, results) => {
             if (err) {
-                console.error('Error getting tutor account:', err);
-                return res.status(500).json({ error: 'Internal Server Error when getting tutor account', err });
+                console.error('Error getting tutor account:' + err);
+                return res.status(500).json({ error: 'Internal Server Error when getting tutor account' + err });
             }
             if (results.length === 0) {
                 return res.status(404).json({ message: 'No tutor account found for this user id' });
@@ -81,8 +81,8 @@ router.get('/gettutor/:tuid', auth, async (req, res) => {
         db.query(getTutorData, [tuid], (err, results) => {
             if (err) {
 
-                console.error('Error getting tutor:', err);
-                return res.status(500).json({ error: 'Internal Server Error when getting tutor', err });
+                console.error('Error getting tutor:' + err);
+                return res.status(500).json({ error: 'Internal Server Error when getting tutor' + err });
             }
             console.log(tuid)
             if (results.length === 0) {
@@ -108,8 +108,8 @@ router.get('/gettutorlinks/:tuid', auth, async (req, res) => {
     `
         db.query(getLinksQuery, [tuid], (err, results) => {
             if (err) {
-                console.error('Error getting tutor links:', err);
-                return res.status(500).json({ error: 'Internal Server Error when getting tutor links', err });
+                console.error('Error getting tutor links:' + err);
+                return res.status(500).json({ error: 'Internal Server Error when getting tutor links' + err });
             }
             if (results.length === 0) {
                 return res.status(404).json({ message: 'No links found for this tutor' });
@@ -119,7 +119,7 @@ router.get('/gettutorlinks/:tuid', auth, async (req, res) => {
         })
     }
     catch (error) {
-        res.status(500).json({ error: 'Internal Server Error when getting tutor links', error })
+        res.status(500).json({ error: 'Internal Server Error when getting tutor links' + error })
 
     }
 })
@@ -139,8 +139,8 @@ router.post('/signup/', auth, async (req, res) => {
         }
         db.query(createTutorAccountQuery, [uuid], (err, results) => {
             if (err) {
-                console.error('Error creating tutor account:', err);
-                return res.status(500).json({ error: 'Internal Server Error when creating tutor account', err });
+                console.error('Error creating tutor account:' + err);
+                return res.status(500).json({ error: 'Internal Server Error when creating tutor account' + err });
             }
             return res.status(201).json({ message: 'Tutor account created successfully' })
         })
@@ -167,7 +167,7 @@ router.post('/addsociallink', auth, async (req, res) => {
             VALUES (UUID_TO_BIN(UUID()), UUID_TO_BIN(?), ?, ?)`;
         db.query(addLinksQuery, [tuid, link, platform], (err, results) => {
             if (err) {
-                console.error('Error adding links:', err);
+                console.error('Error adding links:' + err);
                 return res.status(500).json({ error: 'Internal Server Error when adding links' + err });
             }
             console.log("Link added")

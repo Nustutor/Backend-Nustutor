@@ -21,8 +21,8 @@ router.get('/verifyEmail/:emailVerificationCode/', async (req, res) => {
         `
         db.query(verifyEmailQuery, [verificationCode], (err, results) => {
             if (err) {
-                console.error('Error verifying email:', err);
-                res.status(500).json({ error: 'Internal DB Server Error', err });
+                console.error('Error verifying email:' + err);
+                res.status(500).json({ error: 'Internal DB Server Error' + err });
             }
             else if (results.affectedRows === 0) {
                 console.log('Email verification failed');
@@ -36,7 +36,7 @@ router.get('/verifyEmail/:emailVerificationCode/', async (req, res) => {
         });
     }
     catch (error) {
-        res.status(500).json({ error: 'Internal Server Error when verifying email', err });
+        res.status(500).json({ error: 'Internal Server Error when verifying email' + err });
     }
 })
 
@@ -62,8 +62,8 @@ router.post('/', async (req, res) => {
             [emailVerificationCode, email, hashedPassword, fullname, semester, degree, dept, bio],
             (err, results) => {
                 if (err) {
-                    console.error('Error creating user:', err);
-                    return res.status(500).json({ error: 'Internal Server Error when creating user', err });
+                    console.error('Error creating user:' + err);
+                    return res.status(500).json({ error: 'Internal Server Error when creating user' + err });
                 } else {
                     console.log('User created successfully');
                     console.log('user data', results);
@@ -93,7 +93,7 @@ router.post('/', async (req, res) => {
 
                     transporter.sendMail(mailOptions, async (mailError, result) => {
                         if (mailError) {
-                            // res.status(500).json({ error: 'Internal Server Error when sending verification mail', error });
+                            // res.status(500).json({ error: 'Internal Server Error when sending verification mail'+ error });
                             console.log("Error when sending verification email", mailError)
                             const deleteUserQuery = `
                             DELETE FROM users WHERE email = ?
@@ -113,7 +113,7 @@ router.post('/', async (req, res) => {
         );
 
     } catch (error) {
-        console.error('Error creating user:', error);
+        console.error('Error creating user:' + error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
