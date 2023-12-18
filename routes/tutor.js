@@ -14,7 +14,7 @@ router.get('/getofferedclasses/:tuid', auth, async (req, res) => {
             return res.status(404).json({ message: 'Unauthorized: User ID/Tutor ID is incorrect.' });
         }
         const getClassesQuery = `
-            SELECT BIN_TO_UUID(cuid) as cuid, BIN_TO_UUID(tuid) as tuid, BIN_TO_UUID(suid) as suid, title, description, rate, multipleStudents, availableTimeslots FROM classOffered
+            SELECT BIN_TO_UUID(cuid) as cuid, BIN_TO_UUID(tuid) as tuid, BIN_TO_UUID(suid) as suid, title, description, rate, multipleStudents FROM classOffered
             WHERE  tuid = UUID_TO_BIN(?)
         `
         db.query(getClassesQuery, [tuid], (err, results) => {

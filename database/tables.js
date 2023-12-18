@@ -52,8 +52,13 @@ CREATE TABLE IF NOT EXISTS classOffered (
     title VARCHAR(255),
     description TEXT,
     rate INT,
-    multipleStudents BOOLEAN,
-    availableTimeslots TIMESTAMP
+    multipleStudents BOOLEAN
+);
+
+CREATE TABLE IF NOT EXISTS classOfferedTimeSlots (
+    cuid BINARY(16) REFERENCES classOffered(cuid),
+    startTime INT,
+    PRIMARY KEY (cuid, startTime)
 );
 
 CREATE TABLE IF NOT EXISTS classSchedule (

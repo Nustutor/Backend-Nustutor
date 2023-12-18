@@ -35,9 +35,9 @@ router.get('/subjectclasses/:suid', auth, async (req, res) => {
 })
 
 
-router.post('/addclass', auth, async (req, res) => {
+router.post('/addclass/:tuid', auth, async (req, res) => {
     try {
-        const { tuid } = req.headers;
+        const { tuid } = req.params;
         const { suid, title, description, rate, multipleStudents, availableTimeslots } = req.body;
         if (!validator.isUUID(tuid) || !validator.isUUID(suid)) {
             return res.status(404).json({ message: 'Unauthorized: User / Subject ID does not exist.' });
@@ -52,15 +52,37 @@ router.post('/addclass', auth, async (req, res) => {
                 return res.status(403).json({ message: 'Unauthorized: Token does not match user ID' });
             }
             else {
-                const addClassQuery = `INSERT INTO classOffered (tuid, cuid, suid, title, description, rate, multipleStudents, availableTimeslots)
-                VALUES (UUID_TO_BIN(?), UUID_TO_BIN(UUID()), UUID_TO_BIN(?), ?, ?, ?, ?, ?)`;
-                db.query(addClassQuery, [tuid, suid, title, description, rate, multipleStudents, availableTimeslots], (err, results) => {
+                // available time slots is a list of integers
+                // add the class to class table and the class time slot to class time slot table
+                const addClassQuery = `
+                    INSERT INTO classOffered (tuid, suid, title, description, rate, multipleStudents, cuid)
+                    VALUES (UUID_TO_BIN(?), UUID_TO_BIN(?), ?, ?, ?, ?, UUID_TO_BIN(UUID()))
+                `
+                const addClassTimeSlotsQuery = ` INSERT INTO classOfferedTimeSlots (cuid, startTime) VALUES ?`
+
+                db.query(addClassQuery, [tuid, suid, title, description, rate, multipleStudents], (err, results) => {
                     if (err) {
                         console.error('Error adding class:' + err);
                         return res.status(500).json({ error: 'Internal Server Error when adding class' + err });
                     }
-                    console.log("Class added")
-                    return res.status(201).json({ "Class added:": results })
+                    if (results.affectedRows === 0) {
+                        return res.status(404).json({ message: 'No class added' });
+                    } else {
+                        const cuid = results.insertId;
+                        console.log(cuid)
+                        const values = availableTimeslots.map((time) => [cuid, time])
+                        db.query(addClassTimeSlotsQuery, [values], (err, results) => {
+                            if (err) {
+                                console.error('Error adding class time slots:' + err);
+                                return res.status(500).json({ error: 'Internal Server Error when adding class time slots' + err });
+                            }
+                            if (results.affectedRows === 0) {
+                                return res.status(404).json({ message: 'No class time slots added' });
+                            } else {
+                                return res.status(200).json({ message: 'Class added successfully' })
+                            }
+                        })
+                    }
                 })
             }
         })
