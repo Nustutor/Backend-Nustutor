@@ -22,8 +22,18 @@ const connection = mysql.createConnection({
     user: process.env.MYSQL_USER,
     password: process.env.MYSQL_PASSWORD,
     database: process.env.MYSQL_DATABASE,
-    multipleStatements: true
+    multipleStatements: true,
 })
+
+// function to keep the connection alive
+function pingdb() {
+    var sql_keep = `SELECT 1 + 1 AS solution`;
+    con.query(sql_keep, function (err, result) {
+        if (err) throw err;
+        console.log("Ping DB");
+    });
+}
+setInterval(pingdb, 40000);
 
 
 connection.connect((err) => {
