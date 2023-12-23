@@ -13,16 +13,7 @@ var corsOptions = {
 app.use(cors(corsOptions))
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true }))
-app.use((res, req, next) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader(
-        'Access-Control-Allow-Headers',
-        'Origin, X-Requested-With, Content-Type, Accept, Authorization'
-    );
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE');
 
-    next();
-});
 
 const userRoute = require('./routes/user');
 const signUpRoute = require('./routes/signup');
