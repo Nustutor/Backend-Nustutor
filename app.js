@@ -6,11 +6,8 @@ const port = 4306;
 
 
 
-var corsOptions = {
-    origin: ["http://localhost:3000", "localhost:3000", "*"]
-}
 
-app.use(cors(corsOptions))
+app.use(cors())
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true }))
 
