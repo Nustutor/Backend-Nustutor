@@ -7,7 +7,7 @@ const port = 4306;
 
 
 var corsOptions = {
-    origin: '*'
+    origin: true
 }
 
 app.use(cors(corsOptions))
