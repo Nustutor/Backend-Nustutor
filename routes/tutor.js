@@ -146,7 +146,7 @@ router.post('/signup/', auth, async (req, res) => {
         })
     }
     catch (error) {
-        res.status(500).json({ error: 'Internal Server Error when creating tutor account' })
+        res.status(500).json({ error: 'Internal Server Error when creating tutor account' + err })
     }
 })
 
