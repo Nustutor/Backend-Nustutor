@@ -6,7 +6,9 @@ const port = 4306;
 
 var corsOptions = {
     origin: 'https://nustutor.mooo.com',
-    optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+    optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+    methods: ['GET', 'POST', 'DELETE', 'UPDATE', 'PUT', 'PATCH']
+
 }
 
 app.use(cors(corsOptions))
