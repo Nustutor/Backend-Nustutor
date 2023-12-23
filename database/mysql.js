@@ -28,7 +28,7 @@ const connection = mysql.createConnection({
 // function to keep the connection alive
 function pingdb() {
     var sql_keep = `SELECT 1 + 1 AS solution`;
-    con.query(sql_keep, function (err, result) {
+    connection.query(sql_keep, function (err, result) {
         if (err) throw err;
         console.log("Ping DB");
     });
