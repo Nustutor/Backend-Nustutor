@@ -54,7 +54,7 @@ router.post('/', async (req, res) => {
         });
 
     } catch (error) {
-        res.status(500).json({ error: 'Internal Server Error when logging in.' });
+        res.status(500).json({ error: 'Internal Server Error when logging in.' } + error);
     }
 });
 

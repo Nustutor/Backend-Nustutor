@@ -30,7 +30,7 @@ router.get('/subjectclasses/:suid', auth, async (req, res) => {
         })
     }
     catch (error) {
-        res.status(500).json({ error: 'Internal Server Error when getting classes' })
+        res.status(500).json({ error: 'Internal Server Error when getting classes' } + error)
     }
 })
 
@@ -88,7 +88,7 @@ router.post('/addclass/:tuid', auth, async (req, res) => {
         })
     }
     catch (error) {
-        res.status(500).json({ error: 'Internal Server Error when adding class' })
+        res.status(500).json({ error: 'Internal Server Error when adding class' } + error)
     }
 })
 

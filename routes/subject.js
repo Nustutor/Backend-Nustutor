@@ -25,7 +25,7 @@ router.get('/', auth, async (req, res) => {
         })
     }
     catch (error) {
-        res.status(500).json({ error: 'Internal Server Error when getting subjects' })
+        res.status(500).json({ error: 'Internal Server Error when getting subjects' } + error)
     }
 })
 
@@ -52,7 +52,7 @@ router.get('/subjectid/:suid', auth, async (req, res) => {
         })
     }
     catch (error) {
-        res.status(500).json({ error: 'Internal Server Error when getting subject' })
+        res.status(500).json({ error: 'Internal Server Error when getting subject' } + error)
     }
 })
 
@@ -100,7 +100,7 @@ router.get('/degree_subjects', auth, async (req, res) => {
         })
     }
     catch (error) {
-        res.status(500).json({ error: 'Internal Server Error when getting course' })
+        res.status(500).json({ error: 'Internal Server Error when getting course' } + error)
     }
 
 })
@@ -124,7 +124,7 @@ router.get('/search/', auth, async (req, res) => {
         // Search by name
         db.query(getCourseQuery, [`%${search_term}%`, '', '', ''], (err, results) => {
             if (err) {
-                console.error('Error getting course:' + err);
+                console.error('Error getting course: ');
                 return res.status(500).json({ error: 'Internal Server Error when getting course' + err });
             }
 
@@ -175,7 +175,7 @@ router.get('/search/', auth, async (req, res) => {
             });
         });
     } catch (error) {
-        res.status(500).json({ error: 'Internal Server Error when getting course' });
+        res.status(500).json({ error: 'Internal Server Error when getting course' + error });
     }
 });
 

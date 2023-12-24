@@ -16,7 +16,7 @@ module.exports = function (req, res, next) {
 
             if (err) {
 
-                return res.status(403).json({ message: 'Error when verifying token.' });
+                return res.status(403).json({ message: 'Error when verifying token.' } + err);
             }
 
             // Check if the decoded user ID matches the requested ID
