@@ -6,9 +6,20 @@ const auth = require('../middleware/jwtMiddleware')
 router.get('/', auth, async (req, res) => {
     try {
         const { uuid } = req.headers;
-        const getUserQuery = `
-            SELECT * FROM users WHERE uuid = UUID_TO_BIN(?)
-        `
+        const getUserQuery =
+            ` SELECT
+        UUID_TO_BIN(uuid) AS uuid,
+        fullname,
+        semester,
+        degree,
+        dept,
+        email,
+        password_hash,
+        verifiedEmail,
+        emailVerificationCode,
+        bio
+    FROM
+        users;`
         db.query(getUserQuery, [uuid], (err, results) => {
             if (err) {
                 console.error('Error getting tutor:' + err);
