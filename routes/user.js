@@ -8,7 +8,7 @@ router.get('/', auth, async (req, res) => {
         const { uuid } = req.headers;
         const getUserQuery =
             ` SELECT
-        UUID_TO_BIN(uuid) AS uuid,
+        BIN_TO_UUID(uuid) AS uuid,
         fullname,
         semester,
         degree,
@@ -23,6 +23,7 @@ router.get('/', auth, async (req, res) => {
     WHERE
         uuid = UUID_TO_BIN(?)
         ;`
+
         db.query(getUserQuery, [uuid], (err, results) => {
             if (err) {
                 console.error('Error getting user:' + err);
