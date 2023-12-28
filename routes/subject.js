@@ -56,7 +56,7 @@ router.get('/subjectid/:suid', auth, async (req, res) => {
     }
 })
 
-router.get('/degrees/', auth, async (req, res) => {
+router.get('/degrees/', async (req, res) => {
     //get all degrees available
     try {
         const getDegreeQuery = `
