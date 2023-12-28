@@ -79,10 +79,10 @@ router.get('/degrees/', auth, async (req, res) => {
     }
 })
 
-router.get('/degree_subjects', auth, async (req, res) => {
+router.get('/degree_subjects/:degree', auth, async (req, res) => {
     //get all courses of a specific degree
     try {
-        const { degree } = req.body;
+        const { degree } = req.params;
 
         const getCourseQuery = `
             SELECT name, code FROM subjects WHERE degree = ?
