@@ -60,7 +60,7 @@ router.get('/degrees/', async (req, res) => {
     //get all degrees available
     try {
         const getDegreeQuery = `
-            SELECT degree FROM subjects
+            SELECT UNIQUE degree FROM subjects
         `
         db.query(getDegreeQuery, [], (err, results) => {
             if (err) {
