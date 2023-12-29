@@ -33,8 +33,10 @@ router.get('/', auth, async (req, res) => {
 router.get('/subject_names', auth, async (req, res) => {
     //get all subjects
     try {
-        const getSubjectsQuery = `
-            SELECT DISTINCT name FROM subjects
+        const getSubjectsQuery =
+            //query to only get distinct names, and the suids of those names
+            `
+            SELECT DISTINCT name, BIN_TO_UUID(suid) as suid FROM subjects
         `
         db.query(getSubjectsQuery, (err, results) => {
             if (err) {
