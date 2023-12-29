@@ -10,7 +10,7 @@ router.get('/', auth, async (req, res) => {
     //get all subjects
     try {
         const getSubjectsQuery = `
-            SELECT BIN_TO_UUID(suid) as suid, name, code, degree FROM subjects
+            SELECT DISTINCT BIN_TO_UUID(suid) as suid, name, code, degree FROM subjects
         `
         db.query(getSubjectsQuery, (err, results) => {
             if (err) {
@@ -85,7 +85,7 @@ router.get('/degree_subjects/', auth, async (req, res) => {
         const { degree } = req.headers;
 
         const getCourseQuery = `
-            SELECT name, code FROM subjects WHERE degree = ?
+            SELECT DISTINCT name, code FROM subjects WHERE degree = ?
         `
         db.query(getCourseQuery, [degree], (err, results) => {
             if (err) {
