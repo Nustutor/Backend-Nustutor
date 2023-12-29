@@ -29,6 +29,30 @@ router.get('/', auth, async (req, res) => {
     }
 })
 
+// get all distinct subject names
+router.get('/subject_names', auth, async (req, res) => {
+    //get all subjects
+    try {
+        const getSubjectsQuery = `
+            SELECT DISTINCT name FROM subjects
+        `
+        db.query(getSubjectsQuery, (err, results) => {
+            if (err) {
+                console.error('Error getting subjects:' + err);
+                return res.status(500).json({ error: 'Internal Server Error when getting subjects' + err });
+            }
+            if (results.length === 0) {
+                return res.status(404).json({ message: 'No subjects found' });
+            } else {
+                res.status(200).json({ results })
+            }
+        })
+    }
+    catch (error) {
+        res.status(500).json({ error: 'Internal Server Error when getting subjects' } + error)
+    }
+})
+
 router.get('/subjectid/:suid', auth, async (req, res) => {
     //get subject of a specific id
     try {
