@@ -7,7 +7,7 @@ const validator = require('validator')
 
 
 router.get('/', auth, async (req, res) => {
-    //get all subjects
+
     try {
         const getSubjectsQuery = `
             SELECT DISTINCT BIN_TO_UUID(suid) as suid, name, code, degree FROM subjects
@@ -30,8 +30,7 @@ router.get('/', auth, async (req, res) => {
 })
 
 // get all distinct subject names
-router.get('/', auth, async (req, res) => {
-    //get all subjects
+router.get('/subject_names', auth, async (req, res) => {
     try {
         const getSubjectsQuery = `
         SELECT DISTINCT name, BIN_TO_UUID(suid) as suid FROM subjects
