@@ -64,7 +64,7 @@ CREATE TABLE IF NOT EXISTS classSchedule (
     tuid BINARY(16) REFERENCES tutors(tuid),
     cuid BINARY(16) REFERENCES classOffered(cuid),
     uuid BINARY(16) REFERENCES users(uuid),
-    timeslot int,
+    timeslot int
 );
 `;
 
