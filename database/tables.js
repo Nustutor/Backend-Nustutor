@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS subjects (
     name VARCHAR(255),
     code VARCHAR (255),
     degree VARCHAR(255),
-    UNIQUE KEY unique_subjects (name, code, degree)
+    UNIQUE KEY unique_subjects (name)
 );
 
 CREATE TABLE IF NOT EXISTS classOffered (
