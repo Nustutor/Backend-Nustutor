@@ -132,15 +132,16 @@ router.get('/degree_subjects/', auth, async (req, res) => {
 router.get('/search/', auth, async (req, res) => {
     // Search for a subject
     try {
-        const { search_term } = req.params;
+        const { search_term } = req.headers;
         const getCourseQuery = `
-        SELECT BIN_TO_UUID(subjects.suid) as suid, name, code, degree 
-        FROM subjects      
-        WHERE name LIKE ? 
+        SELECT BIN_TO_UUID(subjects.suid) as suid, subjects.name, subjects.code, subjects.degree 
+        FROM subjects
+        LEFT JOIN classOffered ON subjects.suid = classOffered.suid        
+            WHERE name LIKE ? 
                OR code LIKE ? 
                OR degree LIKE ?
                OR classOffered.title LIKE ?
-        ORDER BY name ASC 
+        ORDER BY subjects.name ASC 
         `;
 
         // Search by name
