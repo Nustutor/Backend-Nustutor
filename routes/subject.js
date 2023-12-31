@@ -143,14 +143,14 @@ router.get('/search/', auth, async (req, res) => {
                OR classOffered.title LIKE ?
         ORDER BY subjects.name ASC 
         `;
-
+        console.log(search_term)
         // Search by name
         db.query(getCourseQuery, [`%${search_term}%`, '', '', ''], (err, results) => {
             if (err) {
                 console.error('Error getting course: ');
                 return res.status(500).json({ error: 'Internal Server Error when getting course' + err });
             }
-
+            console.log(results)
             // If results are found by name, return them
             if (results.length > 0) {
                 return res.status(200).json(results);
