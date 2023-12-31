@@ -143,7 +143,7 @@ router.get('/search/', auth, async (req, res) => {
                OR classOffered.title LIKE ?
         ORDER BY subjects.name ASC 
         `;
-
+        print(term)
         // Search by name
         db.query(getCourseQuery, [`%${term}%`, '', '', ''], (err, results) => {
             if (err) {
