@@ -133,6 +133,7 @@ router.get('/search/', auth, async (req, res) => {
     // Search for a subject
     try {
         const { search_term } = req.headers;
+        console.log(req.headers)
         const getCourseQuery = `
         SELECT BIN_TO_UUID(subjects.suid) as suid, subjects.name, subjects.code, subjects.degree 
         FROM subjects
