@@ -108,7 +108,7 @@ router.get('/degree_subjects/', auth, async (req, res) => {
         const { degree } = req.headers;
 
         const getCourseQuery = `
-            SELECT DISTINCT name, code FROM subjects WHERE degree = ?
+            SELECT DISTINCT name, code, BIN_TO_UUID(suid) as suid FROM subjects WHERE degree = ?
         `
         db.query(getCourseQuery, [degree], (err, results) => {
             if (err) {
