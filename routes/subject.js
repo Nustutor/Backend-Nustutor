@@ -132,8 +132,7 @@ router.get('/degree_subjects/', auth, async (req, res) => {
 router.get('/search/', auth, async (req, res) => {
     // Search for a subject
     try {
-        const { search_term } = req.headers;
-        console.log(req.headers)
+        const { term } = req.headers;
         const getCourseQuery = `
         SELECT BIN_TO_UUID(subjects.suid) as suid, subjects.name, subjects.code, subjects.degree 
         FROM subjects
@@ -144,9 +143,9 @@ router.get('/search/', auth, async (req, res) => {
                OR classOffered.title LIKE ?
         ORDER BY subjects.name ASC 
         `;
-        console.log(search_term)
+
         // Search by name
-        db.query(getCourseQuery, [`%${search_term}%`, '', '', ''], (err, results) => {
+        db.query(getCourseQuery, [`%${term}%`, '', '', ''], (err, results) => {
             if (err) {
                 console.error('Error getting course: ');
                 return res.status(500).json({ error: 'Internal Server Error when getting course' + err });
