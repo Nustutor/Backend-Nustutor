@@ -93,6 +93,37 @@ router.get('/subjectclasses/:suid', auth, async (req, res) => {
     }
 })
 
+//get all classes by subject name
+
+router.get('/subjectclassesbyname/', auth, async (req, res) => {
+    //get all classes of a subject
+    try {
+        const { name } = req.headers;
+        if (!validator.isUUID(req.headers.uuid)) {
+            return res.status(404).json({ message: 'Unauthorized: User UUID is incorrect.' });
+        }
+        const getSubjectClassesQuery = `
+            SELECT BIN_TO_UUID(cuid) as cuid, BIN_TO_UUID(tuid) as tuid, BIN_TO_UUID(suid) as suid, title, description, rate, multipleStudents 
+            FROM classOffered
+            WHERE suid = (SELECT suid FROM subjects WHERE name = ?)
+        `
+        db.query(getSubjectClassesQuery, [name], (err, results) => {
+            if (err) {
+                console.error('Error getting classes:' + err);
+                return res.status(500).json({ error: 'Internal Server Error when getting classes' + err });
+            }
+            if (results.length === 0) {
+                return res.status(404).json({ message: 'No classes found for this subject' });
+            } else {
+                res.status(200).json(results)
+            }
+        })
+    }
+    catch (error) {
+        res.status(500).json({ error: 'Internal Server Error when getting classes' } + error)
+    }
+})
+
 //get all classes of a user FROM HIS CLASS SCHEDULE
 router.get('/userclasses', auth, async (req, res) => {
     try {
