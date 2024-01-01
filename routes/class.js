@@ -296,7 +296,7 @@ router.post('/addclassschedule/:cuid', auth, async (req, res) => {
                 //onsole.log(tuid)
                 // add the class schedule to class schedule table
                 const addClassScheduleQuery = `
-                    INSERT INTO classSchedule (tuid, cuid, uuid, startTime)
+                    INSERT INTO classSchedule (tuid, cuid, uuid, timeslot)
                     VALUES (UUID_TO_BIN(?), UUID_TO_BIN(?), UUID_TO_BIN(?), ?)
                 `
                 db.query(addClassScheduleQuery, [tuid, cuid, uuid, startTime], (err, results) => {
