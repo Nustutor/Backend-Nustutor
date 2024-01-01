@@ -280,7 +280,7 @@ router.post('/addclassschedule/:cuid', auth, async (req, res) => {
         }
 
 
-        if (results[0].uuid !== req.user.userId) {
+        if (uuid !== req.user.userId) {
             return res.status(403).json({ message: 'Unauthorized: Token does not match user ID' });
         }
         else {
