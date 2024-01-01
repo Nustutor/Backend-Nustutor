@@ -274,51 +274,47 @@ router.post('/addclassschedule/:cuid', auth, async (req, res) => {
         const { cuid } = req.params;
         const { uuid } = req.headers;
         const { startTime } = req.body;
-        console.log(req.headers)
+        //console.log(req.headers)
         if (!validator.isUUID(cuid) || !validator.isUUID(uuid)) {
             return res.status(404).json({ message: 'Unauthorized: Class ID/User UUID is incorrect.' });
         }
-        // Check if the decoded user ID matches the requested ID
-        const fetchUUIDquery = 'SELECT BIN_TO_UUID(uuid) as uuid FROM tutors WHERE tuid = UUID_TO_BIN(?)'
-        db.query(fetchUUIDquery, [cuid], (err, results) => {
-            if (err) {
-                return res.status(500).json({ error: 'Internal Server Error when fetching uuid from tuid' + err });
-            }
-            if (results[0].uuid !== req.user.userId) {
-                return res.status(403).json({ message: 'Unauthorized: Token does not match user ID' });
-            }
-            else {
-                // fetch the tuid from the cuid
 
-                const fetchTuidQuery = 'SELECT BIN_TO_UUID(tuid) as tuid FROM classOffered WHERE cuid = UUID_TO_BIN(?)'
 
-                db.query(fetchTuidQuery, [cuid], (err, results) => {
-                    if (err) {
-                        return res.status(500).json({ error: 'Internal Server Error when fetching tuid from cuid' + err });
-                    }
-                    const tuid = results[0].tuid;
-                    //onsole.log(tuid)
-                    // add the class schedule to class schedule table
-                    const addClassScheduleQuery = `
+        if (results[0].uuid !== req.user.userId) {
+            return res.status(403).json({ message: 'Unauthorized: Token does not match user ID' });
+        }
+        else {
+            // fetch the tuid from the cuid
+
+            const fetchTuidQuery = 'SELECT BIN_TO_UUID(tuid) as tuid FROM classOffered WHERE cuid = UUID_TO_BIN(?)'
+
+            db.query(fetchTuidQuery, [cuid], (err, results) => {
+                if (err) {
+                    return res.status(500).json({ error: 'Internal Server Error when fetching tuid from cuid' + err });
+                }
+                const tuid = results[0].tuid;
+                //onsole.log(tuid)
+                // add the class schedule to class schedule table
+                const addClassScheduleQuery = `
                     INSERT INTO classSchedule (tuid, cuid, uuid, startTime)
                     VALUES (UUID_TO_BIN(?), UUID_TO_BIN(?), UUID_TO_BIN(?), ?)
                 `
-                    db.query(addClassScheduleQuery, [tuid, cuid, uuid, startTime], (err, results) => {
-                        if (err) {
-                            console.error('Error adding class schedule:' + err);
-                            return res.status(500).json({ error: 'Internal Server Error when adding class schedule' + err });
-                        }
-                        if (results.affectedRows === 0) {
-                            return res.status(404).json({ message: 'No class schedule added' });
-                        } else {
-                            return res.status(200).json({ message: 'Class schedule added successfully' })
-                        }
-                    })
-
-
+                db.query(addClassScheduleQuery, [tuid, cuid, uuid, startTime], (err, results) => {
+                    if (err) {
+                        console.error('Error adding class schedule:' + err);
+                        return res.status(500).json({ error: 'Internal Server Error when adding class schedule' + err });
+                    }
+                    if (results.affectedRows === 0) {
+                        return res.status(404).json({ message: 'No class schedule added' });
+                    } else {
+                        return res.status(200).json({ message: 'Class schedule added successfully' })
+                    }
                 })
-            }
-        })
+
+
+            })
+        }
+
     }
     catch (error) {
         res.status(500).json({ error: 'Internal Server Error when adding class schedule' } + error)
