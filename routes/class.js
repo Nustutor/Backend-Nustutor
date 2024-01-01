@@ -178,7 +178,7 @@ router.post('/addclass/:tuid', auth, async (req, res) => {
                     INSERT INTO classOffered (tuid, suid, title, description, rate, multipleStudents, cuid)
                     VALUES (UUID_TO_BIN(?), UUID_TO_BIN(?), ?, ?, ?, ?, UUID_TO_BIN(UUID()))
                 `
-                const addClassTimeSlotsQuery = ` INSERT INTO classOfferedTimeSlots (cuid, startTime) VALUES (UUID_TO_BIN(?), ?) `
+
 
                 db.query(addClassQuery, [tuid, suid, title, description, rate, multipleStudents], (err, results) => {
                     if (err) {
@@ -197,31 +197,36 @@ router.post('/addclass/:tuid', auth, async (req, res) => {
                             const cuid = results[0].cuid;
 
 
-                            console.log("CUID is", cuid)
                             const values = availableTimeslots.map((time) => [cuid, time])
-                            console.log(values)
-                            console.log(values[0], values[1])
-                            db.query(addClassTimeSlotsQuery, [values[0][0], values[0][1]], (errorTimeslot, results) => {
-                                if (errorTimeslot) {
-                                    console.error('Error adding class time slots:' + errorTimeslot);
-                                    const deleteClassQuery = 'DELETE FROM classOffered WHERE cuid = UUID_TO_BIN(?)'
+
+
+
+
+                            // Convert UUIDs to binary
+                            const valuesBin = values.map(([uuid, time]) => [db.raw(`UUID_TO_BIN('${uuid}')`), time]);
+
+                            const addClassTimeSlotsQuery = `INSERT INTO classOfferedTimeSlots (cuid, startTime) VALUES ?`;
+                            db.query(addClassTimeSlotsQuery, [valuesBin], (err, results) => {
+                                if (err) {
+                                    console.error('Error adding class time slots:' + err);
+                                    const deleteClassQuery = 'DELETE FROM classOffered WHERE cuid = UUID_TO_BIN(?)';
                                     db.query(deleteClassQuery, [cuid], (err, results) => {
                                         if (err) {
+                                            console.error('Error deleting class:' + err);
                                             return res.status(500).json({ error: 'Internal Server Error when deleting class' + err });
                                         }
                                         if (results.affectedRows === 0) {
                                             return res.status(404).json({ message: 'No class deleted' });
                                         } else {
-                                            return res.status(200).json({ message: 'Class deleted successfully due to error when adding class time slots: ' + errorTimeslot })
+                                            return res.status(500).json({ error: 'Internal Server Error when adding class time slots' + err });
                                         }
-                                    })
-
-                                    // if there is an error, then delete the class that was just added
-
-                                } else {
+                                    });
+                                }
+                                else {
                                     return res.status(200).json({ message: 'Class added successfully' })
                                 }
-                            })
+                            });
+
                         })
                     }
                 })
@@ -291,7 +296,7 @@ router.post('/addclassschedule/:cuid', auth, async (req, res) => {
                         return res.status(500).json({ error: 'Internal Server Error when fetching tuid from cuid' + err });
                     }
                     const tuid = results[0].tuid;
-                    c//onsole.log(tuid)
+                    //onsole.log(tuid)
                     // add the class schedule to class schedule table
                     const addClassScheduleQuery = `
                     INSERT INTO classSchedule (tuid, cuid, uuid, startTime)
