@@ -178,7 +178,7 @@ router.post('/addclass/:tuid', auth, async (req, res) => {
                     INSERT INTO classOffered (tuid, suid, title, description, rate, multipleStudents, cuid)
                     VALUES (UUID_TO_BIN(?), UUID_TO_BIN(?), ?, ?, ?, ?, UUID_TO_BIN(UUID()))
                 `
-                const addClassTimeSlotsQuery = ` INSERT INTO classOfferedTimeSlots (cuid, startTime) VALUES ?`
+                const addClassTimeSlotsQuery = ` INSERT INTO classOfferedTimeSlots (cuid, startTime) VALUES (UUID_TO_BIN(?), ?) `
 
                 db.query(addClassQuery, [tuid, suid, title, description, rate, multipleStudents], (err, results) => {
                     if (err) {
@@ -188,19 +188,40 @@ router.post('/addclass/:tuid', auth, async (req, res) => {
                     if (results.affectedRows === 0) {
                         return res.status(404).json({ message: 'No class added' });
                     } else {
-                        const cuid = results.insertId;
-                        console.log(cuid)
-                        const values = availableTimeslots.map((time) => [cuid, time])
-                        db.query(addClassTimeSlotsQuery, [values], (err, results) => {
+                        // fetch the cuid of the class that was just added
+                        const fetchCuidQuery = 'SELECT BIN_TO_UUID(cuid) as cuid FROM classOffered WHERE tuid = UUID_TO_BIN(?) AND suid = UUID_TO_BIN(?) AND title = ? AND description = ? AND rate = ? AND multipleStudents = ?'
+                        db.query(fetchCuidQuery, [tuid, suid, title, description, rate, multipleStudents], (err, results) => {
                             if (err) {
-                                console.error('Error adding class time slots:' + err);
-                                return res.status(500).json({ error: 'Internal Server Error when adding class time slots' + err });
+                                return res.status(500).json({ error: 'Internal Server Error when fetching cuid from class' + err });
                             }
-                            if (results.affectedRows === 0) {
-                                return res.status(404).json({ message: 'No class time slots added' });
-                            } else {
-                                return res.status(200).json({ message: 'Class added successfully' })
-                            }
+                            const cuid = results[0].cuid;
+
+
+                            console.log("CUID is", cuid)
+                            const values = availableTimeslots.map((time) => [cuid, time])
+                            console.log(values)
+                            console.log(values[0], values[1])
+                            db.query(addClassTimeSlotsQuery, [values[0][0], values[0][1]], (errorTimeslot, results) => {
+                                if (errorTimeslot) {
+                                    console.error('Error adding class time slots:' + errorTimeslot);
+                                    const deleteClassQuery = 'DELETE FROM classOffered WHERE cuid = UUID_TO_BIN(?)'
+                                    db.query(deleteClassQuery, [cuid], (err, results) => {
+                                        if (err) {
+                                            return res.status(500).json({ error: 'Internal Server Error when deleting class' + err });
+                                        }
+                                        if (results.affectedRows === 0) {
+                                            return res.status(404).json({ message: 'No class deleted' });
+                                        } else {
+                                            return res.status(200).json({ message: 'Class deleted successfully due to error when adding class time slots: ' + errorTimeslot })
+                                        }
+                                    })
+
+                                    // if there is an error, then delete the class that was just added
+
+                                } else {
+                                    return res.status(200).json({ message: 'Class added successfully' })
+                                }
+                            })
                         })
                     }
                 })
