@@ -67,7 +67,7 @@ router.post('/', async (req, res) => {
                 } else {
                     console.log('User created successfully');
                     console.log('user data', results);
-                    const verificationLink = "http://localhost:3000/verifyEmail/" + emailVerificationCode + "/";
+                    const verificationLink = "https://nustutor.mooo.com/verifyEmail/" + emailVerificationCode + "/";
                     const emailHTML = getVerificationEmailString(fullname, verificationLink)
                     const transporter = nodemailer.createTransport({
                         service: 'Gmail',
