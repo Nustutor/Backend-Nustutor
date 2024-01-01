@@ -274,6 +274,7 @@ router.post('/addclassschedule/:cuid', auth, async (req, res) => {
         const { cuid } = req.params;
         const { uuid } = req.headers;
         const { startTime } = req.body;
+        console.log(req.headers)
         if (!validator.isUUID(cuid) || !validator.isUUID(uuid)) {
             return res.status(404).json({ message: 'Unauthorized: Class ID/User UUID is incorrect.' });
         }
