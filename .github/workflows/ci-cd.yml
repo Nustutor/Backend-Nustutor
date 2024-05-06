@@ -8,17 +8,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Remote SSH commands
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.EC2_IP }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            export NVM_DIR=~/.nvm
-            source ~/.nvm/nvm.sh
-            cd ${{ secrets.EC2_PATH }}
-            pm2 stop app.js
-            npm install
-            git pull origin main
-            pm2 start app.js
+      # - name: Remote SSH commands
+      #   uses: appleboy/ssh-action@master
+      #   with:
+      #     host: ${{ secrets.EC2_IP }}
+      #     username: ${{ secrets.EC2_USER }}
+      #     key: ${{ secrets.SSH_PRIVATE_KEY }}
+      #     script: |
+      #       export NVM_DIR=~/.nvm
+      #       source ~/.nvm/nvm.sh
+      #       cd ${{ secrets.EC2_PATH }}
+      #       pm2 stop app.js
+      #       npm install
+      #       git pull origin main
+      #       pm2 start app.js
+      - name: Hello world
+        run: echo "Hello world"
