@@ -132,9 +132,9 @@ router.get('/userclasses', auth, async (req, res) => {
             return res.status(404).json({ message: 'Unauthorized: User UUID is incorrect.' });
         }
         const getUserClassesQuery = `
-            SELECT BIN_TO_UUID(cuid) as cuid, BIN_TO_UUID(tuid) as tuid, BIN_TO_UUID(suid) as suid, title, description, rate, multipleStudents
-            FROM classOffered
-            WHERE BIN_TO_UUID(CUID) in (SELECT cuid FROM classSchedule WHERE uuid = UUID_TO_BIN(?))
+        SELECT BIN_TO_UUID(cuid) as cuid, BIN_TO_UUID(tuid) as tuid, BIN_TO_UUID(suid) as suid, title, description, rate, multipleStudents
+        FROM classOffered
+        WHERE CUID IN (SELECT cuid FROM classSchedule WHERE uuid = UUID_TO_BIN(?));
         `
         db.query(getUserClassesQuery, [uuid], (err, results) => {
             if (err) {
