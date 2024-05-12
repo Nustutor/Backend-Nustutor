@@ -45,8 +45,16 @@ router.get('/tutorview/gettutor/', auth, async (req, res) => {
             return res.status(403).json({ message: 'Unauthorized: Token does not match user ID' });
         }
         const getTutorAccountQuery = `
-            SELECT BIN_TO_UUID(tuid) as tuid, BIN_TO_UUID(users.uuid) as uuid, users.fullname, users.semester, users.degree, users.dept, users.bio, users.email FROM tutors, users
-            WHERE users.uuid = UUID_TO_BIN(?)
+        SELECT 
+        BIN_TO_UUID(tutors.tuid) as tuid, 
+        BIN_TO_UUID(users.uuid) as uuid
+    FROM 
+        tutors
+    INNER JOIN 
+        users ON tutors.uuid = users.uuid
+    WHERE 
+        users.uuid = UUID_TO_BIN(?);
+    
         `
         db.query(getTutorAccountQuery, [uuid], (err, results) => {
             if (err) {
